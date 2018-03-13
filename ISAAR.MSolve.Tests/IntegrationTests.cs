@@ -236,5 +236,105 @@ namespace ISAAR.MSolve.Tests
             Assert.Equal(-2.08333333333333333e-5,stohasticAnalyzer.MonteCarloMeanValue,8);
         }
 
+        [Fact]
+        private static void SolveStochasticMaterialBeam2DWithBruteForceMonteCarlo()
+        {
+            #region Beam2D Geometry Data
+            VectorExtensions.AssignTotalAffinityCount();
+            double youngModulus = 2.0e08;
+            double poissonRatio = 0.3;
+            double nodalLoad = 10.0;
+
+            var coefficientProvider = new PowerSpectrumTargetEvaluatorCoefficientsProvider(10, 0.1, .05, 20, 200, DOFType.X, 0.1, 200, 1e-10);
+            StochasticElasticMaterial material = new StochasticElasticMaterial(coefficientProvider)
+            {
+                YoungModulus = youngModulus,
+                PoissonRatio = poissonRatio,
+            };
+
+            // Node creation
+            IList<Node> nodes = new List<Node>();
+            Node node1 = new Node { ID = 0, X = 0.0, Y = 0.0, Z = 0.0 };
+            Node node2 = new Node { ID = 1, X = 5.0, Y = 0.0, Z = 0.0 };
+            Node node3 = new Node { ID = 2, X = 10.0, Y = 0.0, Z = 0.0 };
+            nodes.Add(node1);
+            nodes.Add(node2);
+            nodes.Add(node3);
+
+            // Model creation
+            Model model = new Model();
+
+            // Add a single subdomain to the model
+            model.SubdomainsDictionary.Add(1, new Subdomain() { ID = 1 });
+
+            // Add nodes to the nodes dictonary of the model
+            for (int i = 0; i < nodes.Count; ++i)
+                model.NodesDictionary.Add(i, nodes[i]);
+
+            // Constrain bottom nodes of the model
+            model.NodesDictionary[1].Constraints.Add(DOFType.X);
+            model.NodesDictionary[1].Constraints.Add(DOFType.Y);
+            model.NodesDictionary[1].Constraints.Add(DOFType.RotZ);
+
+            var element1 = new Element()
+            {
+                ID = 0,
+                ElementType = new Beam2DWithStochasticMaterial(material)
+                {
+                    SectionArea = 1,
+                    MomentOfInertia = .1
+                }
+            };
+
+            var element2 = new Element()
+            {
+                ID = 1,
+                ElementType = new Beam2DWithStochasticMaterial(material)
+                {
+                    SectionArea = 1,
+                    MomentOfInertia = .1
+                }
+            };
+
+            // Add nodes to the created element
+            element1.AddNode(model.NodesDictionary[0]);
+            element1.AddNode(model.NodesDictionary[1]);
+
+            element2.AddNode(model.NodesDictionary[1]);
+            element2.AddNode(model.NodesDictionary[2]);
+
+
+            //var a = beam.StiffnessMatrix(element);
+
+            // Add Hexa element to the element and subdomains dictionary of the model
+            model.ElementsDictionary.Add(element1.ID, element1);
+            model.SubdomainsDictionary[1].ElementsDictionary.Add(element1.ID, element1);
+
+            model.ElementsDictionary.Add(element2.ID, element2);
+            model.SubdomainsDictionary[1].ElementsDictionary.Add(element2.ID, element2);
+
+            // Add nodal load values at the top nodes of the model
+            model.Loads.Add(new Load() { Amount = -nodalLoad, Node = model.NodesDictionary[2], DOF = DOFType.Y });
+
+            // Needed in order to make all the required data structures
+            model.ConnectDataStructures();
+            #endregion
+
+            var linearSystems = new Dictionary<int, ILinearSystem>();
+            linearSystems[1] = new SkylineLinearSystem(1, model.Subdomains[0].Forces);
+            SolverSkyline solver = new SolverSkyline(linearSystems[1]);
+            ProblemStructural provider = new ProblemStructural(model, linearSystems);
+            LinearAnalyzer childAnalyzer = new LinearAnalyzer(solver, linearSystems);
+            StaticAnalyzer parentAnalyzer = new StaticAnalyzer(provider, childAnalyzer, linearSystems);
+            MonteCarloAnalyzerWithStochasticMaterial stohasticAnalyzer =
+            new MonteCarloAnalyzerWithStochasticMaterial(model, provider, parentAnalyzer, linearSystems,
+                    coefficientProvider, 1, 10000);
+            stohasticAnalyzer.Initialize();
+            stohasticAnalyzer.Solve();
+
+            Assert.Equal(-2.08333333333333333e-5, stohasticAnalyzer.MonteCarloMeanValue, 8);
+        }
+
+
     }
 }

@@ -143,7 +143,7 @@ namespace ISAAR.MSolve.Analyzers
         {
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[150][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[84][DOFType.Y];
-            int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[80][DOFType.X];
+            int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[2][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[450][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[601][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[6051][DOFType.Y];

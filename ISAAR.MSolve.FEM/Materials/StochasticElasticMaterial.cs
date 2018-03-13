@@ -11,12 +11,7 @@ namespace ISAAR.MSolve.FEM.Materials
     {
         public IStochasticMaterialCoefficientsProvider CoefficientsProvider { get; set; }
 
-        private double _youngModulus;
-        public double YoungModulus
-        {
-            get {return CoefficientsProvider.GetCoefficient(0, null); }
-            set { _youngModulus = value; }
-        }
+        public double YoungModulus { get; set;}
 
         public double PoissonRatio { get; set; }
         public double[] Coordinates { get; set; }

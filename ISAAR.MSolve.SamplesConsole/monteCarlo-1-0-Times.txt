@@ -1,0 +1,5 @@
+Elements: 00:00:00.3061657
+Factorize: 00:00:00.0067393
+Solution: 00:00:00.0096108
+All: 00:00:00
+Total iterations: 0

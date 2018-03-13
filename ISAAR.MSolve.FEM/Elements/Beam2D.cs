@@ -12,7 +12,7 @@ namespace ISAAR.MSolve.FEM.Elements
     {
         private static readonly DOFType[] nodalDOFTypes = new DOFType[3] { DOFType.X, DOFType.Y, DOFType.RotZ };
         private static readonly DOFType[][] dofs = new DOFType[][] { nodalDOFTypes, nodalDOFTypes };
-        private readonly IFiniteElementMaterial material;
+        protected readonly IFiniteElementMaterial material;
         private IFiniteElementDOFEnumerator dofEnumerator = new GenericDOFEnumerator();
 
         public double Density { get; set; }
