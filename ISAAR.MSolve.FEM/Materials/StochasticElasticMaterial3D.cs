@@ -10,7 +10,7 @@ namespace ISAAR.MSolve.FEM.Materials
         private IStochasticMaterialCoefficientsProvider coefficientsProvider;
         private readonly double[] strains = new double[6];
         private readonly double[] stresses = new double[6];
-        //private double[,] constitutiveMatrix = null;
+        private double[,] constitutiveMatrix = null;
         public double YoungModulus { get; set; }
         public double PoissonRatio { get; set; }
         public double[] Coordinates { get; set; }
@@ -24,7 +24,15 @@ namespace ISAAR.MSolve.FEM.Materials
         {
             //double variation = coefficientsProvider.GetCoefficient(YoungModulus, coordinates);
             //double fE1 = variation * YoungModulus / (1.0 + PoissonRatio);
-            double stochasticYoungModulus = coefficientsProvider.GetCoefficient(YoungModulus, coordinates);
+            double stochasticYoungModulus;
+            if (coordinates == null)
+            {
+                stochasticYoungModulus = YoungModulus;
+            }
+            else
+            {
+                stochasticYoungModulus = coefficientsProvider.GetCoefficient(YoungModulus, coordinates);
+            }
             double fE1 = stochasticYoungModulus / (1.0 + PoissonRatio);
             double fE2 = fE1 * PoissonRatio / (1.0 - 2.0 * PoissonRatio);
             double fE3 = fE1 + fE2;
@@ -75,19 +83,19 @@ namespace ISAAR.MSolve.FEM.Materials
         {
             get
             {
-                throw new NotImplementedException();
-                //if (constitutiveMatrix == null) UpdateMaterial(new double[6]);
-                //return new Matrix2D<double>(constitutiveMatrix);
+                //throw new NotImplementedException();
+                if (constitutiveMatrix == null) UpdateMaterial(new double[6]);
+                return new Matrix2D(constitutiveMatrix);
             }
         }
 
         public void UpdateMaterial(double[] strains)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
 
-            //strains.CopyTo(this.strains, 0);
-            //constitutiveMatrix = GetConstitutiveMatrix();
-        }
+            strains.CopyTo(this.strains, 0);
+            constitutiveMatrix = GetConstitutiveMatrix(Coordinates);
+        } 
 
         public void ClearState()
         {
@@ -121,9 +129,9 @@ namespace ISAAR.MSolve.FEM.Materials
             set { coefficientsProvider = value; }
         }
 
-        public IMatrix2D GetConstitutiveMatrix(double[] coordinates)
+        public double[,] GetConstitutiveMatrix(double[] coordinates)
         {
-            return new Matrix2D(GetConstitutiveMatrixInternal(coordinates));
+            return GetConstitutiveMatrixInternal(coordinates);
         }
 
         #endregion

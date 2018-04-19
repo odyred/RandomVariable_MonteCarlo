@@ -56,7 +56,7 @@ namespace ISAAR.MSolve.FEM.Materials
 
         #region IStochasticFiniteElementMaterial
 
-        public IMatrix2D GetConstitutiveMatrix(double[] coordinates)
+        public double[,] GetConstitutiveMatrix(double[] coordinates)
         {
             throw new NotImplementedException();
         }
@@ -68,7 +68,7 @@ namespace ISAAR.MSolve.FEM.Materials
 
         public void ClearState()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void SaveState()

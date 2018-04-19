@@ -9,6 +9,6 @@ namespace ISAAR.MSolve.FEM.Interfaces
     public interface IStochasticFiniteElementMaterial : IFiniteElementMaterial3D
     {
         IStochasticMaterialCoefficientsProvider CoefficientsProvider { get; set; }
-        IMatrix2D GetConstitutiveMatrix(double[] coordinates);
+        double[,] GetConstitutiveMatrix(double[] coordinates);
     }
 }

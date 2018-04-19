@@ -65,6 +65,56 @@ namespace ISAAR.MSolve.Tests
         }
 
         [Fact]
+        public void TestSolveStochasticHexa8CantileverBeam()
+        {
+            VectorExtensions.AssignTotalAffinityCount();
+            Model model = new Model();
+            model.SubdomainsDictionary.Add(0, new Subdomain() { ID = 0 });
+
+            var coefficientProvider = new PowerSpectrumTargetEvaluatorCoefficientsProvider(10, 0.1, .05, 20, 200, DOFType.X, 0.1, 200, 1e-10);
+
+            StochasticHexaSimpleCantileverBeam.MakeCantileverBeam(model, 0, 0, 0, model.NodesDictionary.Count + 1, model.ElementsDictionary.Count + 1, 0, coefficientProvider);
+
+            model.Loads.Add(new Load() { Amount = -0.25, Node = model.Nodes[16], DOF = DOFType.Z });
+            model.Loads.Add(new Load() { Amount = -0.25, Node = model.Nodes[17], DOF = DOFType.Z });
+            model.Loads.Add(new Load() { Amount = -0.25, Node = model.Nodes[18], DOF = DOFType.Z });
+            model.Loads.Add(new Load() { Amount = -0.25, Node = model.Nodes[19], DOF = DOFType.Z });
+ 
+            model.ConnectDataStructures();
+
+            var linearSystems = new Dictionary<int, ILinearSystem>(); //I think this should be done automatically
+            linearSystems[0] = new SkylineLinearSystem(0, model.Subdomains[0].Forces);
+            SolverSkyline solver = new SolverSkyline(linearSystems[0]);
+            ProblemStructural provider = new ProblemStructural(model, linearSystems);
+            LinearAnalyzer childAnalyzer= new LinearAnalyzer(solver, linearSystems);
+            StaticAnalyzer parentAnalyzer = new StaticAnalyzer(provider, childAnalyzer, linearSystems);
+            MonteCarloAnalyzerWithStochasticMaterial stohasticAnalyzer =
+                new MonteCarloAnalyzerWithStochasticMaterial(model, provider, parentAnalyzer, linearSystems,
+                    coefficientProvider, 1, 10000);
+
+            stohasticAnalyzer.Initialize();
+            stohasticAnalyzer.Solve();
+
+            //double[] expectedDisplacements = new double[]
+            //{
+            //    -0.0000025899520106, -0.0000004898560318, -0.0000031099520106, -0.0000025899520106, 0.0000004898560318,
+            //    -0.0000031099520106, 0.0000025899520106, 0.0000004898560318, -0.0000031099520106, 0.0000025899520106,
+            //    -0.0000004898560318, -0.0000031099520106, -0.0000045673419128, -0.0000002423136749, -0.0000107872459340,
+            //    -0.0000045673419128, 0.0000002423136749, -0.0000107872459340, 0.0000045673419128, 0.0000002423136749,
+            //    -0.0000107872459340, 0.0000045673419128, -0.0000002423136749, -0.0000107872459340, -0.0000057299058132,
+            //    -0.0000001253780263, -0.0000216044936601, -0.0000057299058132, 0.0000001253780263, -0.0000216044936601,
+            //    0.0000057299058132, 0.0000001253780263, -0.0000216044936601, 0.0000057299058132, -0.0000001253780263,
+            //    -0.0000216044936601, -0.0000061325564473, -0.0000000425738760, -0.0000339869559207, -0.0000061325564473,
+            //    0.0000000425738760, -0.0000339869559207, 0.0000061325564473, 0.0000000425738760, -0.0000339869559207,
+            //    0.0000061325564473, -0.0000000425738760, -0.0000339869559207
+            //};
+
+            //for (int i = 0; i < expectedDisplacements.Length; i++)
+            //    Assert.Equal(expectedDisplacements[i], linearSystems[1].Solution[i], 10);
+        }
+
+
+        [Fact]
         public void SolveCantileverBeam2D()
         {
             VectorExtensions.AssignTotalAffinityCount();
@@ -337,4 +387,5 @@ namespace ISAAR.MSolve.Tests
 
 
     }
+
 }

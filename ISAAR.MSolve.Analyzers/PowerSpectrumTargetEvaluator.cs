@@ -103,6 +103,7 @@ namespace ISAAR.MSolve.Analyzers
             //var T = period;
             //var n_wu = 20;
             //var Npts = 30;
+            //if (coordinates == null) coordinates = new double;
             var dw = wu / (double)frequencyIntervals;
             int i = 0;
             double randomCoefficient = 0;

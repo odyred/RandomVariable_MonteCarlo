@@ -21,7 +21,7 @@ namespace ISAAR.MSolve.FEM.Elements
         protected readonly static DOFType[] nodalDOFTypes = new DOFType[] { DOFType.X, DOFType.Y, DOFType.Z };
         protected readonly static DOFType[][] dofTypes = new DOFType[][] { nodalDOFTypes, nodalDOFTypes, nodalDOFTypes,
             nodalDOFTypes, nodalDOFTypes, nodalDOFTypes, nodalDOFTypes, nodalDOFTypes };
-        protected readonly IFiniteElementMaterial3D[] materialsAtGaussPoints;
+        protected IFiniteElementMaterial3D[] materialsAtGaussPoints;
         protected IFiniteElementDOFEnumerator dofEnumerator = new GenericDOFEnumerator();
 
         #region Fortran imports
@@ -330,7 +330,7 @@ namespace ISAAR.MSolve.FEM.Elements
             return shapeFunctionDerivatives;
         }
 
-        private GaussLegendrePoint3D[] CalculateGaussMatrices(double[,] nodeCoordinates)
+        protected GaussLegendrePoint3D[] CalculateGaussMatrices(double[,] nodeCoordinates)
         {
             GaussLegendrePoint1D[] integrationPointsPerAxis =
                 GaussQuadrature.GetGaussLegendrePoints(iInt);
