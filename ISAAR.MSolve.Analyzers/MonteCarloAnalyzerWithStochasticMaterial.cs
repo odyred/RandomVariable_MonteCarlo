@@ -13,6 +13,7 @@ using ISAAR.MSolve.Numerical.LinearAlgebra.Interfaces;
 using ISAAR.MSolve.Numerical.LinearAlgebra;
 using ISAAR.MSolve.FEM.Entities;
 using ISAAR.MSolve.FEM.Interfaces;
+using ISAAR.MSolve.Materials.Interfaces;
 
 namespace ISAAR.MSolve.Analyzers
 {
@@ -234,7 +235,7 @@ namespace ISAAR.MSolve.Analyzers
         {
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[150][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[84][DOFType.Y];
-            int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[19][DOFType.Z];
+            int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[10][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[450][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[601][DOFType.Y];
             //int dofNo = model.Subdomains[0].GlobalNodalDOFsDictionary[6051][DOFType.Y];
@@ -275,7 +276,7 @@ namespace ISAAR.MSolve.Analyzers
 
                 times["solution"] += DateTime.Now - e;
                 GCSettings.LatencyMode = GCLatencyMode.Batch;
-                //values[i - simulationStartFrom] = subdomains[0].Solution[dofNo].ToString();
+                values[i - simulationStartFrom] = subdomains[0].Solution[dofNo].ToString();
                 numberValues[i - simulationStartFrom] = subdomains[0].Solution[dofNo];
                 //values[i] = subdomains[36].Solution[dofNo].ToString();
 

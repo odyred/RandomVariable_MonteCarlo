@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ISAAR.MSolve.FEM.Elements;
 using ISAAR.MSolve.FEM.Entities;
-using ISAAR.MSolve.FEM.Interfaces;
 using ISAAR.MSolve.FEM.Materials;
+using ISAAR.MSolve.Materials.Interfaces;
 using ISAAR.MSolve.Numerical.LinearAlgebra;
 using ISAAR.MSolve.Numerical.LinearAlgebra.Interfaces;
 
@@ -13,7 +12,8 @@ namespace ISAAR.MSolve.FEM.Elements
 {
     public class Beam2DMemoizer
     {
-        private readonly Dictionary<int, Tuple<double[], double[,,]>> integrationDictionary = new Dictionary<int, Tuple<double[], double[,,]>>();
+        private readonly Dictionary<int, Tuple<double[], double[,,]>> integrationDictionary =
+            new Dictionary<int, Tuple<double[], double[,,]>>();
 
         public Tuple<double[], double[,,]> GetIntegrationData(int element)
         {
@@ -29,16 +29,18 @@ namespace ISAAR.MSolve.FEM.Elements
         }
     }
 
-    public class Beam2DWithStochasticMaterial : Beam2D
+    public class Beam2DWithStochasticMaterial : EulerBeam2D
     {
-        //protected readonly new IStochasticFiniteElementMaterial Material;
+        protected readonly new IStochasticFiniteElementMaterial Material;
         protected readonly Beam2DMemoizer memoizer;
 
-        public Beam2DWithStochasticMaterial(IStochasticFiniteElementMaterial material) :base(material)
+        public Beam2DWithStochasticMaterial(IStochasticFiniteElementMaterial material): base((material as StochasticElasticMaterial).YoungModulus)
         {
+            this.Material = material;
         }
 
-        public Beam2DWithStochasticMaterial(IStochasticFiniteElementMaterial material, Beam2DMemoizer memoizer) : this(material)
+        public Beam2DWithStochasticMaterial(IStochasticFiniteElementMaterial material, Beam2DMemoizer memoizer) :
+            this(material)
         {
             this.memoizer = memoizer;
         }
@@ -59,17 +61,22 @@ namespace ISAAR.MSolve.FEM.Elements
             double s = (element.Nodes[1].Y - element.Nodes[0].Y) / L;
             double s2 = s * s;
             double[] coordinates = GetStochasticPoints(element);
-            double EL = (material as StochasticElasticMaterial).GetStochasticMaterialProperties(coordinates)[0] / L;
+            double EL = (Material as StochasticElasticMaterial).GetStochasticMaterialProperties(coordinates)[0] / L;
             double EAL = EL * SectionArea;
             double EIL = EL * MomentOfInertia;
             double EIL2 = EIL / L;
             double EIL3 = EIL2 / L;
-            return DOFEnumerator.GetTransformedMatrix(new SymmetricMatrix2D(new double[] { c2*EAL+12*s2*EIL3, c*s*EAL-12*c*s*EIL3, -6*s*EIL2, -c2*EAL-12*s2*EIL3, -c*s*EAL+12*c*s*EIL3, -6*s*EIL2,
-                s2*EAL+12*c2*EIL3, 6*c*EIL2, -s*c*EAL+12*c*s*EIL3, -s2*EAL-12*c2*EIL3, 6*c*EIL2,
-                4*EIL, 6*s*EIL2, -6*c*EIL2, 2*EIL,
-                c2*EAL+12*s2*EIL3, s*c*EAL-12*c*s*EIL3, 6*s*EIL2,
-                s2*EAL+12*c2*EIL3, -6*c*EIL2,
-                4*EIL }));
+            return DOFEnumerator.GetTransformedMatrix(new SymmetricMatrix2D(new double[]
+            {
+                c2 * EAL + 12 * s2 * EIL3, c * s * EAL - 12 * c * s * EIL3, -6 * s * EIL2, -c2 * EAL - 12 * s2 * EIL3,
+                -c * s * EAL + 12 * c * s * EIL3, -6 * s * EIL2,
+                s2 * EAL + 12 * c2 * EIL3, 6 * c * EIL2, -s * c * EAL + 12 * c * s * EIL3, -s2 * EAL - 12 * c2 * EIL3,
+                6 * c * EIL2,
+                4 * EIL, 6 * s * EIL2, -6 * c * EIL2, 2 * EIL,
+                c2 * EAL + 12 * s2 * EIL3, s * c * EAL - 12 * c * s * EIL3, 6 * s * EIL2,
+                s2 * EAL + 12 * c2 * EIL3, -6 * c * EIL2,
+                4 * EIL
+            }));
         }
 
         private double[] GetStochasticPoints(Element element)
@@ -86,15 +93,19 @@ namespace ISAAR.MSolve.FEM.Elements
                 minY = minY > element.Nodes[i].Y ? element.Nodes[i].Y : minY;
                 for (int j = i + 1; j < 2; j++)
                 {
-                    X = X < Math.Abs(element.Nodes[j].X - element.Nodes[i].X) ? Math.Abs(element.Nodes[j].X - element.Nodes[i].X) : X;
-                    Y = Y < Math.Abs(element.Nodes[j].Y - element.Nodes[i].Y) ? Math.Abs(element.Nodes[j].Y - element.Nodes[i].Y) : Y;
+                    X = X < Math.Abs(element.Nodes[j].X - element.Nodes[i].X)
+                        ? Math.Abs(element.Nodes[j].X - element.Nodes[i].X)
+                        : X;
+                    Y = Y < Math.Abs(element.Nodes[j].Y - element.Nodes[i].Y)
+                        ? Math.Abs(element.Nodes[j].Y - element.Nodes[i].Y)
+                        : Y;
                 }
             }
 
             double pointX = minX + X / 2;
             double pointY = minY + Y / 2;
 
-            return new double[] { pointX, pointY};
+            return new double[] {pointX, pointY};
 
             //// Calculate for individual gauss point
             ////if (iInt != 2) throw new ArgumentException("Stochastic provided functions with integration order of 2.");

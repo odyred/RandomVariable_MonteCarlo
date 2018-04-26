@@ -8,10 +8,11 @@ using ISAAR.MSolve.Solvers.Skyline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Text;
-using ISAAR.MSolve.FEM.Materials;
 using ISAAR.MSolve.FEM.Elements;
+using ISAAR.MSolve.FEM.Interfaces;
+using ISAAR.MSolve.FEM.Materials;
+using ISAAR.MSolve.Materials.Interfaces;
 
 namespace ISAAR.MSolve.SamplesConsole
 {
@@ -55,7 +56,7 @@ namespace ISAAR.MSolve.SamplesConsole
             SolverSkyline solver = new SolverSkyline(linearSystems[1]);
             ProblemStructural provider = new ProblemStructural(model, linearSystems);
             LinearAnalyzer analyzer = new LinearAnalyzer(solver, linearSystems);
-            NewmarkDynamicAnalyzer parentAnalyzer = new NewmarkDynamicAnalyzer(provider, analyzer, linearSystems, 0.5, 0.25, 0.01, 0.1);
+            NewmarkDynamicAnalyzer parentAnalyzer = new NewmarkDynamicAnalyzer(provider, analyzer, linearSystems, 0.25, 0.5, 0.01, 0.1);
 
             analyzer.LogFactories[1] = new LinearAnalyzerLogFactory(new int[] { 420 });
 
@@ -72,13 +73,13 @@ namespace ISAAR.MSolve.SamplesConsole
             double poissonRatio = 0.3;
             double nodalLoad = 10.0;
 
-            var coefficientProvider = new PowerSpectrumTargetEvaluatorCoefficientsProvider(10, 0.1, .05, 20, 200, DOFType.X, 0.1, 200, 1e-10);
+            IStochasticMaterialCoefficientsProvider coefficientProvider = new PowerSpectrumTargetEvaluatorCoefficientsProvider(10, 0.1, .05, 20, 200, DOFType.X, 0.1, 200, 1e-10);
             StochasticElasticMaterial material = new StochasticElasticMaterial(coefficientProvider)
             {
                 YoungModulus = youngModulus,
                 PoissonRatio = poissonRatio,
             };
-        
+
             // Model creation
             Model model = new Model();
 
@@ -102,7 +103,7 @@ namespace ISAAR.MSolve.SamplesConsole
             model.NodesDictionary[0].Constraints.Add(DOFType.Y);
             model.NodesDictionary[0].Constraints.Add(DOFType.RotZ);
 
-            for (int i = 0; i < model.NodesDictionary.Count-1; i++)
+            for (int i = 0; i < model.NodesDictionary.Count - 1; i++)
             {
                 var element = new Element()
                 {
@@ -114,14 +115,14 @@ namespace ISAAR.MSolve.SamplesConsole
                     }
                 };
                 element.AddNode(model.NodesDictionary[i]);
-                element.AddNode(model.NodesDictionary[i+1]);
-                model.ElementsDictionary.Add(i,element);
+                element.AddNode(model.NodesDictionary[i + 1]);
+                model.ElementsDictionary.Add(i, element);
                 model.SubdomainsDictionary[0].ElementsDictionary.Add(i, element);
             }
-            
+
 
             // Add nodal load values at the right end of the cantilever
-            model.Loads.Add(new Load() { Amount = -nodalLoad, Node = model.NodesDictionary[model.NodesDictionary.Count-1], DOF = DOFType.Y });
+            model.Loads.Add(new Load() { Amount = -nodalLoad, Node = model.NodesDictionary[model.NodesDictionary.Count - 1], DOF = DOFType.Y });
 
             // Needed in order to make all the required data structures
             model.ConnectDataStructures();
@@ -146,7 +147,8 @@ namespace ISAAR.MSolve.SamplesConsole
 
         static void Main(string[] args)
         {
-            SolveStochasticMaterialBeam2DWithBruteForceMonteCarlo();
+            //SolveBuildingInNoSoilSmall();
+            TrussExample.Run();
         }
     }
 }
