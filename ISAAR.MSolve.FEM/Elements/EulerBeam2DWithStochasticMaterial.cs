@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using ISAAR.MSolve.FEM.Entities;
 using ISAAR.MSolve.FEM.Materials;
-//using ISAAR.MSolve.Materials.Interfaces;
+using ISAAR.MSolve.FEM.Interfaces;
+using ISAAR.MSolve.Materials.Interfaces;
 using ISAAR.MSolve.Numerical.LinearAlgebra;
 using ISAAR.MSolve.Numerical.LinearAlgebra.Interfaces;
 
@@ -31,13 +32,18 @@ namespace ISAAR.MSolve.FEM.Elements
 
     public class EulerBeam2DWithStochasticMaterial : EulerBeam2D
     {
-        //protected readonly new IStochasticFiniteElementMaterial Material;
+        protected readonly IStochasticMaterialCoefficientsProvider coefficientsProvider;
         protected readonly EulerBeam2DMemoizer memoizer;
         private readonly double youngModulus;
 
-        public EulerBeam2DWithStochasticMaterial(double youngModulus) //: base((material as StochasticElasticMaterial).YoungModulus)
+        public EulerBeam2DWithStochasticMaterial(double youngModulus) : base(youngModulus)
         {
-            this.youngModulus = youngModulus;
+        }
+
+        public EulerBeam2DWithStochasticMaterial(double youngModulus, IStochasticMaterialCoefficientsProvider coefficientsProvider)
+            : base(youngModulus)
+        {
+            this.coefficientsProvider = coefficientsProvider;
         }
 
         public EulerBeam2DWithStochasticMaterial(double youngModulus, EulerBeam2DMemoizer memoizer) :
@@ -62,7 +68,7 @@ namespace ISAAR.MSolve.FEM.Elements
             double s = (element.Nodes[1].Y - element.Nodes[0].Y) / L;
             double s2 = s * s;
             double[] coordinates = GetStochasticPoints(element);
-            double EL = (Material as StochasticElasticMaterial).GetStochasticMaterialProperties(coordinates)[0] / L;
+            double EL = coefficientsProvider.GetCoefficient(youngModulus, coordinates) / L;
             double EAL = EL * SectionArea;
             double EIL = EL * MomentOfInertia;
             double EIL2 = EIL / L;

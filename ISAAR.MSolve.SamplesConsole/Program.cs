@@ -108,7 +108,7 @@ namespace ISAAR.MSolve.SamplesConsole
                 var element = new Element()
                 {
                     ID = i,
-                    ElementType = new EulerBeam2DWithStochasticMaterial(material)
+                    ElementType = new EulerBeam2DWithStochasticMaterial(youngModulus, coefficientProvider)
                     {
                         SectionArea = 1,
                         MomentOfInertia = 0.1

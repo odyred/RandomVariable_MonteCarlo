@@ -122,11 +122,11 @@ namespace ISAAR.MSolve.Tests
             double poissonRatio = 0.3;
             double nodalLoad = 10.0;
 
-            ElasticMaterial material = new ElasticMaterial()
-            {
-                YoungModulus = youngModulus,
-                PoissonRatio = poissonRatio,
-            };
+            //ElasticMaterial material = new ElasticMaterial()
+            //{
+            //    YoungModulus = youngModulus,
+            //    PoissonRatio = poissonRatio,
+            //};
 
             // Node creation
             IList<Node> nodes = new List<Node>();
@@ -208,15 +208,15 @@ namespace ISAAR.MSolve.Tests
             #region Beam2D Geometry Data
             VectorExtensions.AssignTotalAffinityCount();
             double youngModulus = 2.0e08;
-            double poissonRatio = 0.3;
+            //double poissonRatio = 0.3;
             double nodalLoad = 10.0;
 
             var coefficientProvider = new RandomVariableTargetEvaluator(1 / youngModulus, 0.1 / youngModulus, RandomVariableDistributionType.Normal);
-            StochasticElasticMaterial material = new StochasticElasticMaterial(coefficientProvider)
-            {
-                YoungModulus = youngModulus,
-                PoissonRatio = poissonRatio,
-            };
+            //StochasticElasticMaterial material = new StochasticElasticMaterial(coefficientProvider)
+            //{
+            //    YoungModulus = youngModulus,
+            //    PoissonRatio = poissonRatio,
+            //};
 
             // Node creation
             IList<Node> nodes = new List<Node>();
@@ -242,7 +242,7 @@ namespace ISAAR.MSolve.Tests
 
 
             // Create a new Beam2D element
-            var beam = new EulerBeam2D(youngModulus)
+            var beam = new EulerBeam2DWithStochasticMaterial(youngModulus, coefficientProvider)
             {
                 SectionArea = 1,
                 MomentOfInertia = .1
@@ -329,7 +329,7 @@ namespace ISAAR.MSolve.Tests
             var element1 = new Element()
             {
                 ID = 0,
-                ElementType = new EulerBeam2DWithStochasticMaterial(material)
+                ElementType = new EulerBeam2DWithStochasticMaterial(youngModulus, coefficientProvider)
                 {
                     SectionArea = 1,
                     MomentOfInertia = .1
@@ -339,7 +339,7 @@ namespace ISAAR.MSolve.Tests
             var element2 = new Element()
             {
                 ID = 1,
-                ElementType = new EulerBeam2DWithStochasticMaterial(material)
+                ElementType = new EulerBeam2DWithStochasticMaterial(youngModulus, coefficientProvider)
                 {
                     SectionArea = 1,
                     MomentOfInertia = .1
