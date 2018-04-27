@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using ISAAR.MSolve.FEM.Entities;
 using ISAAR.MSolve.FEM.Materials;
-using ISAAR.MSolve.Materials.Interfaces;
+//using ISAAR.MSolve.Materials.Interfaces;
 using ISAAR.MSolve.Numerical.LinearAlgebra;
 using ISAAR.MSolve.Numerical.LinearAlgebra.Interfaces;
 
 namespace ISAAR.MSolve.FEM.Elements
 {
-    public class Beam2DMemoizer
+    public class EulerBeam2DMemoizer
     {
         private readonly Dictionary<int, Tuple<double[], double[,,]>> integrationDictionary =
             new Dictionary<int, Tuple<double[], double[,,]>>();
@@ -29,18 +29,19 @@ namespace ISAAR.MSolve.FEM.Elements
         }
     }
 
-    public class Beam2DWithStochasticMaterial : EulerBeam2D
+    public class EulerBeam2DWithStochasticMaterial : EulerBeam2D
     {
-        protected readonly new IStochasticFiniteElementMaterial Material;
-        protected readonly Beam2DMemoizer memoizer;
+        //protected readonly new IStochasticFiniteElementMaterial Material;
+        protected readonly EulerBeam2DMemoizer memoizer;
+        private readonly double youngModulus;
 
-        public Beam2DWithStochasticMaterial(IStochasticFiniteElementMaterial material): base((material as StochasticElasticMaterial).YoungModulus)
+        public EulerBeam2DWithStochasticMaterial(double youngModulus) //: base((material as StochasticElasticMaterial).YoungModulus)
         {
-            this.Material = material;
+            this.youngModulus = youngModulus;
         }
 
-        public Beam2DWithStochasticMaterial(IStochasticFiniteElementMaterial material, Beam2DMemoizer memoizer) :
-            this(material)
+        public EulerBeam2DWithStochasticMaterial(double youngModulus, EulerBeam2DMemoizer memoizer) :
+            this(youngModulus)
         {
             this.memoizer = memoizer;
         }

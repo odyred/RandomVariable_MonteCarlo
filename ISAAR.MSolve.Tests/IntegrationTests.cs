@@ -329,7 +329,7 @@ namespace ISAAR.MSolve.Tests
             var element1 = new Element()
             {
                 ID = 0,
-                ElementType = new Beam2DWithStochasticMaterial(material)
+                ElementType = new EulerBeam2DWithStochasticMaterial(material)
                 {
                     SectionArea = 1,
                     MomentOfInertia = .1
@@ -339,7 +339,7 @@ namespace ISAAR.MSolve.Tests
             var element2 = new Element()
             {
                 ID = 1,
-                ElementType = new Beam2DWithStochasticMaterial(material)
+                ElementType = new EulerBeam2DWithStochasticMaterial(material)
                 {
                     SectionArea = 1,
                     MomentOfInertia = .1
