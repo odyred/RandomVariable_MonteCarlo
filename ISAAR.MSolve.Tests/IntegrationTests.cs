@@ -220,25 +220,25 @@ namespace ISAAR.MSolve.Tests
 
             // Node creation
             IList<Node> nodes = new List<Node>();
-            Node node1 = new Node { ID = 1, X = 0.0, Y = 0.0, Z = 0.0 };
-            Node node2 = new Node { ID = 2, X = 5.0, Y = 0.0, Z = 0.0 };
+            Node node0 = new Node { ID = 0, X = 0.0, Y = 0.0, Z = 0.0 };
+            Node node1 = new Node { ID = 1, X = 5.0, Y = 0.0, Z = 0.0 };
+            nodes.Add(node0);
             nodes.Add(node1);
-            nodes.Add(node2);
 
             // Model creation
             Model model = new Model();
 
             // Add a single subdomain to the model
-            model.SubdomainsDictionary.Add(1, new Subdomain() { ID = 1 });
+            model.SubdomainsDictionary.Add(0, new Subdomain() { ID = 0 });
 
             // Add nodes to the nodes dictonary of the model
             for (int i = 0; i < nodes.Count; ++i)
-                model.NodesDictionary.Add(i + 1, nodes[i]);
+                model.NodesDictionary.Add(i, nodes[i]);
 
             // Constrain bottom nodes of the model
-            model.NodesDictionary[1].Constraints.Add(DOFType.X);
-            model.NodesDictionary[1].Constraints.Add(DOFType.Y);
-            model.NodesDictionary[1].Constraints.Add(DOFType.RotZ);
+            model.NodesDictionary[0].Constraints.Add(DOFType.X);
+            model.NodesDictionary[0].Constraints.Add(DOFType.Y);
+            model.NodesDictionary[0].Constraints.Add(DOFType.RotZ);
 
 
             // Create a new Beam2D element
@@ -250,30 +250,30 @@ namespace ISAAR.MSolve.Tests
 
             var element = new Element()
             {
-                ID = 1,
+                ID = 0,
                 ElementType = beam
             };
 
             // Add nodes to the created element
+            element.AddNode(model.NodesDictionary[0]);
             element.AddNode(model.NodesDictionary[1]);
-            element.AddNode(model.NodesDictionary[2]);
 
             var a = beam.StiffnessMatrix(element);
 
             // Add Hexa element to the element and subdomains dictionary of the model
             model.ElementsDictionary.Add(element.ID, element);
-            model.SubdomainsDictionary[1].ElementsDictionary.Add(element.ID, element);
+            model.SubdomainsDictionary[0].ElementsDictionary.Add(element.ID, element);
 
             // Add nodal load values at the top nodes of the model
-            model.Loads.Add(new Load() { Amount = -nodalLoad, Node = model.NodesDictionary[2], DOF = DOFType.Y });
+            model.Loads.Add(new Load() { Amount = -nodalLoad, Node = model.NodesDictionary[1], DOF = DOFType.Y });
 
             // Needed in order to make all the required data structures
             model.ConnectDataStructures();
             #endregion
 
             var linearSystems = new Dictionary<int, ILinearSystem>();
-            linearSystems[1] = new SkylineLinearSystem(1, model.Subdomains[0].Forces);
-            SolverSkyline solver = new SolverSkyline(linearSystems[1]);
+            linearSystems[0] = new SkylineLinearSystem(0, model.Subdomains[0].Forces);
+            SolverSkyline solver = new SolverSkyline(linearSystems[0]);
             ProblemStructural provider = new ProblemStructural(model, linearSystems);
             Analyzers.LinearAnalyzer childAnalyzer = new LinearAnalyzer(solver, linearSystems);
             StaticAnalyzer parentAnalyzer = new StaticAnalyzer(provider, childAnalyzer, linearSystems);
@@ -304,29 +304,29 @@ namespace ISAAR.MSolve.Tests
 
             // Node creation
             IList<Node> nodes = new List<Node>();
-            Node node1 = new Node { ID = 0, X = 0.0, Y = 0.0, Z = 0.0 };
-            Node node2 = new Node { ID = 1, X = 5.0, Y = 0.0, Z = 0.0 };
-            Node node3 = new Node { ID = 2, X = 10.0, Y = 0.0, Z = 0.0 };
+            Node node0 = new Node { ID = 0, X = 0.0, Y = 0.0, Z = 0.0 };
+            Node node1 = new Node { ID = 1, X = 5.0, Y = 0.0, Z = 0.0 };
+            Node node2 = new Node { ID = 2, X = 10.0, Y = 0.0, Z = 0.0 };
+            nodes.Add(node0);
             nodes.Add(node1);
             nodes.Add(node2);
-            nodes.Add(node3);
 
             // Model creation
             Model model = new Model();
 
             // Add a single subdomain to the model
-            model.SubdomainsDictionary.Add(1, new Subdomain() { ID = 1 });
+            model.SubdomainsDictionary.Add(0, new Subdomain() { ID = 0 });
 
             // Add nodes to the nodes dictonary of the model
             for (int i = 0; i < nodes.Count; ++i)
                 model.NodesDictionary.Add(i, nodes[i]);
 
             // Constrain bottom nodes of the model
-            model.NodesDictionary[1].Constraints.Add(DOFType.X);
-            model.NodesDictionary[1].Constraints.Add(DOFType.Y);
-            model.NodesDictionary[1].Constraints.Add(DOFType.RotZ);
+            model.NodesDictionary[0].Constraints.Add(DOFType.X);
+            model.NodesDictionary[0].Constraints.Add(DOFType.Y);
+            model.NodesDictionary[0].Constraints.Add(DOFType.RotZ);
 
-            var element1 = new Element()
+            var element0 = new Element()
             {
                 ID = 0,
                 ElementType = new EulerBeam2DWithStochasticMaterial(youngModulus, coefficientProvider)
@@ -336,7 +336,7 @@ namespace ISAAR.MSolve.Tests
                 }
             };
 
-            var element2 = new Element()
+            var element1 = new Element()
             {
                 ID = 1,
                 ElementType = new EulerBeam2DWithStochasticMaterial(youngModulus, coefficientProvider)
@@ -347,21 +347,21 @@ namespace ISAAR.MSolve.Tests
             };
 
             // Add nodes to the created element
-            element1.AddNode(model.NodesDictionary[0]);
-            element1.AddNode(model.NodesDictionary[1]);
+            element0.AddNode(model.NodesDictionary[0]);
+            element0.AddNode(model.NodesDictionary[1]);
 
-            element2.AddNode(model.NodesDictionary[1]);
-            element2.AddNode(model.NodesDictionary[2]);
+            element1.AddNode(model.NodesDictionary[1]);
+            element1.AddNode(model.NodesDictionary[2]);
 
 
             //var a = beam.StiffnessMatrix(element);
 
             // Add Hexa element to the element and subdomains dictionary of the model
-            model.ElementsDictionary.Add(element1.ID, element1);
-            model.SubdomainsDictionary[1].ElementsDictionary.Add(element1.ID, element1);
+            model.ElementsDictionary.Add(element0.ID, element0);
+            model.SubdomainsDictionary[0].ElementsDictionary.Add(element0.ID, element0);
 
-            model.ElementsDictionary.Add(element2.ID, element2);
-            model.SubdomainsDictionary[1].ElementsDictionary.Add(element2.ID, element2);
+            model.ElementsDictionary.Add(element1.ID, element1);
+            model.SubdomainsDictionary[0].ElementsDictionary.Add(element1.ID, element1);
 
             // Add nodal load values at the top nodes of the model
             model.Loads.Add(new Load() { Amount = -nodalLoad, Node = model.NodesDictionary[2], DOF = DOFType.Y });
@@ -371,8 +371,8 @@ namespace ISAAR.MSolve.Tests
             #endregion
 
             var linearSystems = new Dictionary<int, ILinearSystem>();
-            linearSystems[1] = new SkylineLinearSystem(1, model.Subdomains[0].Forces);
-            SolverSkyline solver = new SolverSkyline(linearSystems[1]);
+            linearSystems[0] = new SkylineLinearSystem(0, model.Subdomains[0].Forces);
+            SolverSkyline solver = new SolverSkyline(linearSystems[0]);
             ProblemStructural provider = new ProblemStructural(model, linearSystems);
             LinearAnalyzer childAnalyzer = new LinearAnalyzer(solver, linearSystems);
             StaticAnalyzer parentAnalyzer = new StaticAnalyzer(provider, childAnalyzer, linearSystems);
@@ -382,7 +382,8 @@ namespace ISAAR.MSolve.Tests
             stohasticAnalyzer.Initialize();
             stohasticAnalyzer.Solve();
 
-            Assert.Equal(-2.08333333333333333e-5, stohasticAnalyzer.MonteCarloMeanValue, 8);
+            Assert.Equal(-1.61252208683504e-04, stohasticAnalyzer.MonteCarloMeanValue, 6);
+            Assert.Equal(-1.4187096239967777e-05, stohasticAnalyzer.MonteCarloStandardDeviation, 6);
         }
 
 

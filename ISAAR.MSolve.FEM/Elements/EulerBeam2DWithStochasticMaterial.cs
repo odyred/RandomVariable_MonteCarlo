@@ -38,18 +38,21 @@ namespace ISAAR.MSolve.FEM.Elements
 
         public EulerBeam2DWithStochasticMaterial(double youngModulus) : base(youngModulus)
         {
+            this.youngModulus = youngModulus;
         }
 
         public EulerBeam2DWithStochasticMaterial(double youngModulus, IStochasticMaterialCoefficientsProvider coefficientsProvider)
             : base(youngModulus)
         {
             this.coefficientsProvider = coefficientsProvider;
+            this.youngModulus = youngModulus;
         }
 
         public EulerBeam2DWithStochasticMaterial(double youngModulus, EulerBeam2DMemoizer memoizer) :
             this(youngModulus)
         {
             this.memoizer = memoizer;
+            this.youngModulus = youngModulus;
         }
 
         //public Hexa8WithStochasticMaterial(IFiniteElementMaterial3D material, IStochasticCoefficientsProvider coefficientsProvider)
