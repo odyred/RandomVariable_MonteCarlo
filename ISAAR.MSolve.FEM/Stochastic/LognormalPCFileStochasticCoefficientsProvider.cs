@@ -147,21 +147,21 @@ namespace ISAAR.MSolve.FEM.Stochastic
 
         #region IStochasticCoefficientsProvider Members
 
-        double IStochasticCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinates)
+        double IStochasticCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinate)
         {
-            return GetCoefficientInternal(meanValue, coordinates, CurrentOrder);
+            return GetCoefficientInternal(meanValue, coordinate, CurrentOrder);
         }
 
         #endregion
 
         #region IStochasticMaterialCoefficientsProvider Members
 
-        double IStochasticMaterialCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinates)
+        double IStochasticMaterialCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinate)
         {
             // Possibly erroneous. Check with Giovanis.
             double result = 0;
             for (int i = 0; i < RandomVariables.Length; i++)
-                result += RandomVariables[i] * GetCoefficientInternal(meanValue, coordinates, i);
+                result += RandomVariables[i] * GetCoefficientInternal(meanValue, coordinate, i);
             return Math.Exp(result) - mean;
         }
         

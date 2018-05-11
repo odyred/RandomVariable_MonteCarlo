@@ -90,20 +90,20 @@ namespace ISAAR.MSolve.FEM.Stochastic
 
         #region IStochasticCoefficientsProvider Members
 
-        double IStochasticCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinates)
+        double IStochasticCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinate)
         {
-            return GetCoefficientInternal(coordinates, CurrentOrder);
+            return GetCoefficientInternal(coordinate, CurrentOrder);
         }
 
         #endregion
 
         #region IStochasticMaterialCoefficientsProvider Members
 
-        double IStochasticMaterialCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinates)
+        double IStochasticMaterialCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinate)
         {
             double result = 1;
             for (int i = 0; i < RandomVariables.Length; i++)
-                result += RandomVariables[i] * GetCoefficientInternal(coordinates, i);
+                result += RandomVariables[i] * GetCoefficientInternal(coordinate, i);
             return result * meanValue;
         }
         

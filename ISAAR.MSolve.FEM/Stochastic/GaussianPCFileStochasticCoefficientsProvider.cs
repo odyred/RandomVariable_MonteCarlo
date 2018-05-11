@@ -128,26 +128,26 @@ namespace ISAAR.MSolve.FEM.Stochastic
             //double l_n = 1;
             //for (int i = 0; i < calculator.PsiBasis[order].Length; i++)
             //    if (calculator.PsiBasis[order][i] > 0)
-            //        l_n *= Math.Pow(GetBasisCoefficientInternal(coordinates, order), calculator.PsiBasis[order][i]);
+            //        l_n *= Math.Pow(GetBasisCoefficientInternal(coordinate, order), calculator.PsiBasis[order][i]);
             //return l_n / calculator.PsiSquareNorm[order];
         }
 
         #region IStochasticCoefficientsProvider Members
 
-        double IStochasticCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinates)
+        double IStochasticCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinate)
         {
-            return meanValue * GetCoefficientInternal(coordinates, CurrentOrder);
+            return meanValue * GetCoefficientInternal(coordinate, CurrentOrder);
         }
 
         #endregion
 
         #region IStochasticMaterialCoefficientsProvider Members
 
-        double IStochasticMaterialCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinates)
+        double IStochasticMaterialCoefficientsProvider.GetCoefficient(double meanValue, double[] coordinate)
         {
             double result = 0;
             for (int i = 0; i < RandomVariables.Length; i++)
-                result += RandomVariables[i] * GetCoefficientInternal(coordinates, i);
+                result += RandomVariables[i] * GetCoefficientInternal(coordinate, i);
             return Math.Exp(result);
         }
         

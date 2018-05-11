@@ -96,7 +96,7 @@ namespace ISAAR.MSolve.Analyzers
             nptsSff = (int)(period * wu / Math.PI);            
         }
 
-        public double GetCoefficient(double meanValue, double[] coordinates)
+        public double GetCoefficient(double meanValue, double[] coordinate)
         {
             //var Sff = sffTarget;
             //var ku = wu;
@@ -104,14 +104,14 @@ namespace ISAAR.MSolve.Analyzers
             //var T = period;
             //var n_wu = 20;
             //var Npts = 30;
-            //if (coordinates == null) coordinates = new double;
+            //if (coordinate == null) coordinate = new double;
             var dw = wu / (double)frequencyIntervals;
             int i = 0;
             double randomCoefficient = 0;
             while (i < frequencyIntervals)
             {
                 randomCoefficient += Math.Sqrt(2) * Math.Sqrt(2 * SpectralDensity(dw / 2 + i * dw) * dw) *
-                                     (Math.Cos((dw / 2 + i * dw) * coordinates[(int)randomFieldDirection - 1] +
+                                     (Math.Cos((dw / 2 + i * dw) * coordinate[(int)randomFieldDirection - 1] +
                                      phi[i]));
                 i++;
             }

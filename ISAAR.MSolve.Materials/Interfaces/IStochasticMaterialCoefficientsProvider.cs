@@ -9,6 +9,6 @@ namespace ISAAR.MSolve.Materials.Interfaces
 
     {
     double[] RandomVariables { get; set; }
-    double GetCoefficient(double meanValue, double[] coordinates);
+    double GetCoefficient(double meanValue, double[] coordinate);
     }
 }
